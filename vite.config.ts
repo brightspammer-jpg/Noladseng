@@ -318,7 +318,15 @@ export default defineConfig(({ mode }) => {
       port: 5173,
       strictPort: false,
       proxy: {
-        '/api': 'http://localhost:8000',
+        '/api': {
+          target: 'http://localhost:8000',
+          changeOrigin: true,
+          bypass(req) {
+            if (req.url?.startsWith('/api/contact') || req.url?.startsWith('/api/quotes')) {
+              return req.url; // let Vite middleware handle these endpoints
+            }
+          }
+        },
       },
     },
     build: {
