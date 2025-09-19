@@ -1,7 +1,9 @@
+import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import type { Request, Response, NextFunction } from 'express';
 import contactRoutes from './routes/contact';
+import quotesEmailRoutes from './routes/quotes-email';
 
 const app = express();
 const PORT = process.env.PORT || 8000;
@@ -18,6 +20,7 @@ app.use((req, res, next) => {
 
 // API Routes
 app.use('/api/contact', contactRoutes);
+app.use('/api/quotes', quotesEmailRoutes);
 
 // Health check route
 app.get('/health', (req, res) => {
