@@ -7,8 +7,10 @@ const router = express.Router();
 // Create contact message (DB insert via service role) and send email
 router.post('/create', async (req, res) => {
 	try {
+		console.log('[contact:create] body:', req.body);
 		const { name, email, phone, subject, message, status = 'unread' } = req.body || {};
 		if (!name || !email || !message) {
+			console.warn('[contact:create] validation failed');
 			return res.status(400).json({ success: false, error: 'name, email, and message are required' });
 		}
 
