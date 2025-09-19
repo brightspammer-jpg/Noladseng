@@ -55,7 +55,7 @@ const parseList = (raw: unknown): string[] => {
       v = v.slice(1, -1).trim();
     }
     v = v.replace(/^[\[\]{}()]+|[\[\]{}()]+$/g, '');
-    v = v.replace(/^([\-*•–—]|\d+[.)])\s+/, '');
+    v = v.replace(/^([\-*•��—]|\d+[.)])\s+/, '');
     v = v.replace(/\s+/g, ' ');
     return v;
   };
@@ -114,6 +114,39 @@ export default function Index() {
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [companyStats, setCompanyStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [homeForm, setHomeForm] = useState({ firstName: '', lastName: '', email: '', company: '', message: '' });
+  const [homeSubmitting, setHomeSubmitting] = useState(false);
+
+  const submitHomeForm = async () => {
+    const fname = homeForm.firstName.trim();
+    const lname = homeForm.lastName.trim();
+    const email = homeForm.email.trim();
+    const message = homeForm.message.trim();
+    if (!fname || !lname || !email || !message) {
+      toast.error('Please fill in first name, last name, email and message.');
+      return;
+    }
+    setHomeSubmitting(true);
+    try {
+      const response = await api.contact.create({
+        name: `${fname} ${lname}`.trim(),
+        email,
+        subject: 'Homepage Contact',
+        message: `Company: ${homeForm.company}\n\n${message}`,
+        status: 'unread'
+      });
+      if (response.success) {
+        toast.success('Message sent. We will get back to you shortly.');
+        setHomeForm({ firstName: '', lastName: '', email: '', company: '', message: '' });
+      } else {
+        throw new Error(response.error || 'Failed to send message');
+      }
+    } catch (e) {
+      toast.error('Failed to send message. Please try again.');
+    } finally {
+      setHomeSubmitting(false);
+    }
+  };
 
   // Build Top Services JSON-LD from featured services
   const topServicesItemList = {
@@ -987,6 +1020,8 @@ export default function Index() {
                       <input
                         type="text"
                         placeholder="Enter your first name"
+                        value={homeForm.firstName}
+                        onChange={(e) => setHomeForm((p) => ({ ...p, firstName: e.target.value }))}
                         className="w-full h-10 px-3 bg-white border border-slate-300 rounded-md text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 shadow-sm"
                       />
                     </div>
@@ -997,6 +1032,8 @@ export default function Index() {
                       <input
                         type="text"
                         placeholder="Enter your last name"
+                        value={homeForm.lastName}
+                        onChange={(e) => setHomeForm((p) => ({ ...p, lastName: e.target.value }))}
                         className="w-full h-10 px-3 bg-white border border-slate-300 rounded-md text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 shadow-sm"
                       />
                     </div>
@@ -1008,6 +1045,8 @@ export default function Index() {
                     <input
                       type="email"
                       placeholder="Enter your email"
+                      value={homeForm.email}
+                      onChange={(e) => setHomeForm((p) => ({ ...p, email: e.target.value }))}
                       className="w-full h-10 px-3 bg-white border border-slate-300 rounded-md text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 shadow-sm"
                     />
                   </div>
@@ -1018,6 +1057,8 @@ export default function Index() {
                     <input
                       type="text"
                       placeholder="Enter your company name"
+                      value={homeForm.company}
+                      onChange={(e) => setHomeForm((p) => ({ ...p, company: e.target.value }))}
                       className="w-full h-10 px-3 bg-white border border-slate-300 rounded-md text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 shadow-sm"
                     />
                   </div>
@@ -1028,6 +1069,8 @@ export default function Index() {
                     <textarea
                       rows={4}
                       placeholder="Tell us about your project requirements"
+                      value={homeForm.message}
+                      onChange={(e) => setHomeForm((p) => ({ ...p, message: e.target.value }))}
                       className="w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 resize-none shadow-sm"
                     />
                   </div>
@@ -1036,9 +1079,11 @@ export default function Index() {
                   <ModernButton
                     variant="primary"
                     size="lg"
-                    className="w-full bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-400 hover:to-yellow-300 text-blue-900 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200"
+                    onClick={submitHomeForm}
+                    disabled={homeSubmitting}
+                    className="w-full bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-400 hover:to-yellow-300 text-blue-900 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 disabled:opacity-60"
                   >
-                    Send Message
+                    {homeSubmitting ? 'Sending...' : 'Send Message'}
                     <ArrowRight className="w-4 h-4" />
                   </ModernButton>
                 </CardFooter>
