@@ -52,19 +52,12 @@ const FALLBACK_DATA: AnalyticsFallbackData = {
 
 const handleAnalyticsError = (res: any, error: any, message: string, fallbackData: any = null) => {
   console.error(`Error in analytics route: ${message}`, error);
-  
-  if (!ga4Analytics.isConfigured) {
-    return res.json({
-      success: true,
-      error: 'GA4 analytics not configured',
-      data: fallbackData || FALLBACK_DATA
-    });
-  }
-  
-  return res.status(500).json({
-    success: false,
+
+  // Always return 200 with fallback data so the UI remains functional
+  return res.json({
+    success: true,
     error: message,
-    data: fallbackData || null
+    data: fallbackData || FALLBACK_DATA
   });
 };
 
