@@ -435,6 +435,7 @@ const ContactPage = () => {
                         value={formData.company}
                         onChange={handleInputChange}
                         placeholder="Enter your company name"
+                        errorMessage={errors.company}
                         required
                       />
                       <ModernInput
