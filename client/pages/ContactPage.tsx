@@ -400,6 +400,7 @@ const ContactPage = () => {
                         value={formData.lastName}
                         onChange={handleInputChange}
                         placeholder="Enter your last name"
+                        errorMessage={errors.lastName}
                         required
                       />
                     </div>
