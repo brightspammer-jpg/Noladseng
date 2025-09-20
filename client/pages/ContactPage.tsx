@@ -33,7 +33,7 @@ import {
   CardDescription,
   CardGrid,
 } from "../components/ui/modern-card";
-import { ModernInput } from "../components/ui/modern-input";
+import { ModernInput, ModernTextarea } from "../components/ui/modern-input";
 import { companyInfo } from "../src/companyData";
 
 const ContactPage = () => {
