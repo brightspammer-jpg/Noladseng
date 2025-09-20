@@ -13,6 +13,16 @@ function adminApiPlugin(env: Record<string, string>): Plugin {
   process.env.GA4_CLIENT_EMAIL = process.env.GA4_CLIENT_EMAIL || env.GA4_CLIENT_EMAIL || '';
   process.env.GA4_PRIVATE_KEY = process.env.GA4_PRIVATE_KEY || env.GA4_PRIVATE_KEY || '';
 
+  // Expose SMTP/email env vars so server routes can send emails when running via Vite
+  process.env.SMTP_HOST = process.env.SMTP_HOST || env.SMTP_HOST || '';
+  process.env.SMTP_PORT = process.env.SMTP_PORT || env.SMTP_PORT || '';
+  process.env.SMTP_USER = process.env.SMTP_USER || env.SMTP_USER || '';
+  process.env.SMTP_PASS = process.env.SMTP_PASS || env.SMTP_PASS || '';
+  process.env.EMAIL_FROM = process.env.EMAIL_FROM || env.EMAIL_FROM || '';
+  process.env.EMAIL_TO = process.env.EMAIL_TO || env.EMAIL_TO || '';
+  process.env.CONTACT_RECIPIENT = process.env.CONTACT_RECIPIENT || env.CONTACT_RECIPIENT || '';
+  process.env.QUOTES_RECIPIENT = process.env.QUOTES_RECIPIENT || env.QUOTES_RECIPIENT || '';
+
   return {
     name: 'admin-api-plugin',
     async configureServer(server) {
@@ -71,6 +81,8 @@ function adminApiPlugin(env: Record<string, string>): Plugin {
         const { default: adminQuotesRouter } = await import('./server/routes/admin-quotes');
         const { default: adminContactsRouter } = await import('./server/routes/admin-contacts');
         const { default: analyticsRouter } = await import('./server/routes/analyticsRoutes');
+        const { default: contactRouter } = await import('./server/routes/contact');
+        const { default: quotesEmailRouter } = await import('./server/routes/quotes-email');
 
         console.log('[admin-api-plugin] Mounting routes:');
 
@@ -119,6 +131,10 @@ function adminApiPlugin(env: Record<string, string>): Plugin {
         mountRoute('/api/admin/blog', adminBlogRouter);
         mountRoute('/api/admin/quotes', adminQuotesRouter);
         mountRoute('/api/admin/contacts', adminContactsRouter);
+
+        // Mount public email routes for contact/quotes
+        app.use('/api/contact', contactRouter);
+        app.use('/api/quotes', quotesEmailRouter);
 
         // Mount analytics routes under /api to handle GA endpoints during dev
         app.use('/api', analyticsRouter);
@@ -202,6 +218,8 @@ function adminApiPlugin(env: Record<string, string>): Plugin {
         const { default: adminQuotesRouter } = await import('./server/routes/admin-quotes');
         const { default: adminContactsRouter } = await import('./server/routes/admin-contacts');
         const { default: analyticsRouter } = await import('./server/routes/analyticsRoutes');
+        const { default: contactRouter } = await import('./server/routes/contact');
+        const { default: quotesEmailRouter } = await import('./server/routes/quotes-email');
 
         console.log('[admin-api-plugin] Mounting preview routes:');
 
@@ -251,6 +269,10 @@ function adminApiPlugin(env: Record<string, string>): Plugin {
         mountRoute('/api/admin/quotes', adminQuotesRouter);
         mountRoute('/api/admin/contacts', adminContactsRouter);
 
+        // Mount public email routes for contact/quotes
+        app.use('/api/contact', contactRouter);
+        app.use('/api/quotes', quotesEmailRouter);
+
         // Mount analytics routes under /api to handle GA endpoints during preview
         app.use('/api', analyticsRouter);
 
@@ -296,7 +318,15 @@ export default defineConfig(({ mode }) => {
       port: 5173,
       strictPort: false,
       proxy: {
-        '/api': 'http://localhost:8000',
+        '/api': {
+          target: 'http://localhost:8000',
+          changeOrigin: true,
+          bypass(req) {
+            if (req.url?.startsWith('/api/contact') || req.url?.startsWith('/api/quotes')) {
+              return req.url; // let Vite middleware handle these endpoints
+            }
+          }
+        },
       },
     },
     build: {

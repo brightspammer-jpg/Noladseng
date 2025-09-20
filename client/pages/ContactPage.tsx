@@ -33,34 +33,38 @@ import {
   CardDescription,
   CardGrid,
 } from "../components/ui/modern-card";
-import { ModernInput } from "../components/ui/modern-input";
+import { ModernInput, ModernTextarea } from "../components/ui/modern-input";
 import { companyInfo } from "../src/companyData";
 
 const ContactPage = () => {
   const [isQuoteModalOpen, setIsQuoteModalOpen] = useState(false);
-  
+
   useSEO({
     title: `Contact ${companyInfo.name} - Get Expert Electrical Engineering Support`,
     description: `Contact our electrical engineering experts for power systems, industrial automation, and safety solutions. Get professional consultation and project quotes.`,
-    keywords: 'contact electrical engineer, power systems consultation, industrial automation support, electrical engineering quotes',
-    canonical: typeof window !== 'undefined' ? `${window.location.origin}/contact` : undefined,
+    keywords:
+      "contact electrical engineer, power systems consultation, industrial automation support, electrical engineering quotes",
+    canonical:
+      typeof window !== "undefined"
+        ? `${window.location.origin}/contact`
+        : undefined,
     structuredData: {
       "@context": "https://schema.org",
       "@type": "ContactPage",
-      "mainEntity": {
+      mainEntity: {
         "@type": "Organization",
-        "name": companyInfo.name,
-        "url": typeof window !== 'undefined' ? window.location.origin : undefined,
-        "contactPoint": [
+        name: companyInfo.name,
+        url: typeof window !== "undefined" ? window.location.origin : undefined,
+        contactPoint: [
           {
             "@type": "ContactPoint",
-            "telephone": companyInfo.offices[0]?.phone[0],
-            "contactType": "customer service",
-            "email": companyInfo.offices[0]?.email
-          }
-        ]
-      }
-    }
+            telephone: companyInfo.offices[0]?.phone[0],
+            contactType: "customer service",
+            email: companyInfo.offices[0]?.email,
+          },
+        ],
+      },
+    },
   });
 
   const [formData, setFormData] = useState({
@@ -70,7 +74,7 @@ const ContactPage = () => {
     phone: "",
     company: "",
     position: "",
-    inquiryType: "",
+    inquiryType: "general",
     project: "",
     timeline: "",
     budget: "",
@@ -90,9 +94,9 @@ const ContactPage = () => {
     serviceUsed: "",
     location: "",
     wouldRecommend: true,
-    projectCompleted: ""
+    projectCompleted: "",
   });
-  
+
   const { validate } = useFormValidation(contactFormSchema);
   const trackFormSubmission = (...args: any[]) => {
     // No-op or implement tracking logic here if needed
@@ -102,10 +106,10 @@ const ContactPage = () => {
   const handleReviewSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!rating) {
-      notify.error('Error', 'Please provide a rating');
+      notify.error("Error", "Please provide a rating");
       return;
     }
-    
+
     try {
       await api.testimonials.create({
         name: reviewData.name,
@@ -114,10 +118,13 @@ const ContactPage = () => {
         company: reviewData.location, // Using location as company
         position: reviewData.serviceUsed, // Using serviceUsed as position
         is_featured: false,
-        is_active: false // Will be activated after review
+        is_active: false, // Will be activated after review
       });
-      
-      notify.success('Thank you!', 'Your review has been submitted successfully and will be reviewed shortly.');
+
+      notify.success(
+        "Thank you!",
+        "Your review has been submitted successfully and will be reviewed shortly.",
+      );
       setIsReviewOpen(false);
       setReviewData({
         name: "",
@@ -126,11 +133,11 @@ const ContactPage = () => {
         serviceUsed: "",
         location: "",
         wouldRecommend: true,
-        projectCompleted: ""
+        projectCompleted: "",
       });
       setRating(0);
     } catch (error) {
-      notify.error('Error', 'Failed to submit your review. Please try again.');
+      notify.error("Error", "Failed to submit your review. Please try again.");
     }
   };
 
@@ -150,18 +157,18 @@ const ContactPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+
     const validation = validate(formData);
     if (!validation.isValid) {
       setErrors(validation.errors);
       setIsSubmitting(false);
-      notify.error('Form Error', 'Please fix the errors below and try again.');
-      trackFormSubmission('contact_form', false);
+      notify.error("Form Error", "Please fix the errors below and try again.");
+      trackFormSubmission("contact_form", false);
       return;
     }
-    
+
     setErrors({});
-    
+
     try {
       const response = await api.contact.create({
         name: `${formData.firstName} ${formData.lastName}`,
@@ -169,17 +176,20 @@ const ContactPage = () => {
         phone: formData.phone,
         subject: formData.inquiryType,
         message: `Company: ${formData.company}\nPosition: ${formData.position}\nProject: ${formData.project}\n\nMessage: ${formData.message}`,
-        status: 'unread'
+        status: "unread",
       });
 
       if (response.success) {
         setSubmitted(true);
-        notify.success('Message Sent!', 'Thank you for contacting us. We\'ll get back to you soon.');
-        trackFormSubmission('contact_form', true);
-        trackFormSubmission('contact_form', true);
+        notify.success(
+          "Message Sent!",
+          "Thank you for contacting us. We'll get back to you soon.",
+        );
+        trackFormSubmission("contact_form", true);
+        trackFormSubmission("contact_form", true);
         // If Analytics.trackEngagement is needed, implement or import it properly.
       } else {
-        throw new Error(response.error || 'Failed to send message');
+        throw new Error(response.error || "Failed to send message");
       }
       setFormData({
         firstName: "",
@@ -188,17 +198,19 @@ const ContactPage = () => {
         phone: "",
         company: "",
         position: "",
-        inquiryType: "",
+        inquiryType: "general",
         project: "",
         timeline: "",
         budget: "",
         message: "",
         newsletter: false,
       });
-      
     } catch (error) {
-      notify.error('Submission Failed', 'There was an error sending your message. Please try again.');
-      trackFormSubmission('contact_form', false);
+      notify.error(
+        "Submission Failed",
+        "There was an error sending your message. Please try again.",
+      );
+      trackFormSubmission("contact_form", false);
     } finally {
       setIsSubmitting(false);
     }
@@ -267,14 +279,14 @@ const ContactPage = () => {
     },
   ];
 
-  const offices = companyInfo.offices.map(office => ({
+  const offices = companyInfo.offices.map((office) => ({
     name: office.name,
-    address: `${office.address}${office.poBox ? `, ${office.poBox}` : ''}`,
-    phone: office.phone.join(' / '),
+    address: `${office.address}${office.poBox ? `, ${office.poBox}` : ""}`,
+    phone: office.phone.join(" / "),
     email: office.email,
     hours: [
       "Monday - Friday: 8:00 AM - 5:00 PM",
-      "Saturday : 8:00 AM - 1:00 PM"
+      "Saturday : 8:00 AM - 1:00 PM",
     ],
     image: "/placeholder.svg",
   }));
@@ -305,7 +317,7 @@ const ContactPage = () => {
         <section className="section flex items-center justify-center min-h-[80vh]">
           <div className="container">
             <div className="max-w-2xl mx-auto text-center">
-            <ModernCard variant="elevated" className="card-md">
+              <ModernCard variant="elevated" className="card-md">
                 <CardContent className="py-16 px-8">
                   <div className="w-24 h-24 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-8">
                     <CheckCircle className="w-12 h-12 text-emerald-600" />
@@ -373,7 +385,7 @@ const ContactPage = () => {
           <div className="grid lg:grid-cols-2 gap-16">
             {/* Contact Form */}
             <div className="animate-slide-in-left">
-            <ModernCard className="card-md">
+              <ModernCard className="card-md">
                 <CardHeader>
                   <CardTitle>Send us a message</CardTitle>
                   <CardDescription>
@@ -391,6 +403,7 @@ const ContactPage = () => {
                         value={formData.firstName}
                         onChange={handleInputChange}
                         placeholder="Enter your first name"
+                        errorMessage={errors.firstName}
                         required
                       />
                       <ModernInput
@@ -399,6 +412,7 @@ const ContactPage = () => {
                         value={formData.lastName}
                         onChange={handleInputChange}
                         placeholder="Enter your last name"
+                        errorMessage={errors.lastName}
                         required
                       />
                     </div>
@@ -411,6 +425,7 @@ const ContactPage = () => {
                         value={formData.email}
                         onChange={handleInputChange}
                         placeholder="Enter your email"
+                        errorMessage={errors.email}
                         required
                       />
                       <ModernInput
@@ -420,6 +435,7 @@ const ContactPage = () => {
                         value={formData.phone}
                         onChange={handleInputChange}
                         placeholder="Enter your phone number"
+                        errorMessage={errors.phone}
                       />
                     </div>
 
@@ -431,6 +447,7 @@ const ContactPage = () => {
                         value={formData.company}
                         onChange={handleInputChange}
                         placeholder="Enter your company name"
+                        errorMessage={errors.company}
                         required
                       />
                       <ModernInput
@@ -439,6 +456,7 @@ const ContactPage = () => {
                         value={formData.position}
                         onChange={handleInputChange}
                         placeholder="Your job title"
+                        errorMessage={errors.position}
                       />
                     </div>
 
@@ -478,6 +496,17 @@ const ContactPage = () => {
                         ))}
                       </div>
                     </div>
+
+                    {/* Message */}
+                    <ModernTextarea
+                      label="Message *"
+                      name="message"
+                      value={formData.message}
+                      onChange={handleInputChange}
+                      placeholder="Tell us about your project requirements"
+                      errorMessage={errors.message}
+                      required
+                    />
 
                     {/* Project Details */}
                     <div className="grid grid-cols-2 gap-4">
@@ -522,14 +551,21 @@ const ContactPage = () => {
                       </div>
                     </div>
 
+                    {errors.inquiryType && (
+                      <p className="text-red-500 text-sm">
+                        {errors.inquiryType}
+                      </p>
+                    )}
+
                     <ModernButton
                       type="submit"
                       variant="primary"
                       size="lg"
-                      className="w-full"
+                      disabled={isSubmitting}
+                      className="w-full disabled:opacity-60"
                     >
                       <Send className="w-5 h-5" />
-                      Send Message
+                      {isSubmitting ? "Sending…" : "Send Message"}
                     </ModernButton>
                   </form>
                 </CardContent>
@@ -570,7 +606,9 @@ const ContactPage = () => {
                 <div className="space-y-4">
                   <Link to="/blog" />
 
-                  <a href={`tel:${companyInfo.contactPersons.general.phone[0]}`} />
+                  <a
+                    href={`tel:${companyInfo.contactPersons.general.phone[0]}`}
+                  />
                 </div>
               </div>
             </div>
@@ -591,9 +629,7 @@ const ContactPage = () => {
                 <h4 className="font-semibold text-slate-900 mb-2">
                   {faq.question}
                 </h4>
-                <p className="text-slate-600 text-sm">
-                  {faq.answer}
-                </p>
+                <p className="text-slate-600 text-sm">{faq.answer}</p>
               </CardContent>
             ))}
           </ModernCard>
@@ -653,7 +689,7 @@ const ContactPage = () => {
                         <Clock className="w-5 h-5 text-slate-400 mt-0.5 flex-shrink-0" />
                         <div className="text-slate-600 text-sm">
                           {Array.isArray(office.hours)
-                            ? office.hours.map((h, i) => (<p key={i}>{h}</p>))
+                            ? office.hours.map((h, i) => <p key={i}>{h}</p>)
                             : office.hours}
                         </div>
                       </div>
@@ -677,7 +713,8 @@ const ContactPage = () => {
                     Your Feedback Matters!
                   </h3>
                   <p className="text-slate-600 mb-6">
-                    Help us improve our services by sharing your experience with Nolads Engineering.
+                    Help us improve our services by sharing your experience with
+                    Nolads Engineering.
                   </p>
                   <ModernButton
                     variant="primary"
@@ -706,7 +743,9 @@ const ContactPage = () => {
                             type="button"
                             onClick={() => setRating(star)}
                             className={`p-1 rounded-full transition-colors hover:scale-110 ${
-                              rating >= star ? 'text-yellow-400' : 'text-gray-300'
+                              rating >= star
+                                ? "text-yellow-400"
+                                : "text-gray-300"
                             }`}
                           >
                             <Star className="w-8 h-8 fill-current" />
@@ -714,11 +753,17 @@ const ContactPage = () => {
                         ))}
                       </div>
                       <p className="text-sm text-slate-600">
-                        {rating === 5 ? "Excellent!" :
-                         rating === 4 ? "Very Good" :
-                         rating === 3 ? "Good" :
-                         rating === 2 ? "Fair" :
-                         rating === 1 ? "Poor" : "Click to rate"}
+                        {rating === 5
+                          ? "Excellent!"
+                          : rating === 4
+                            ? "Very Good"
+                            : rating === 3
+                              ? "Good"
+                              : rating === 2
+                                ? "Fair"
+                                : rating === 1
+                                  ? "Poor"
+                                  : "Click to rate"}
                       </p>
                     </div>
 
@@ -727,7 +772,9 @@ const ContactPage = () => {
                         label="Full Name"
                         name="reviewerName"
                         value={reviewData.name}
-                        onChange={(e) => setReviewData({ ...reviewData, name: e.target.value })}
+                        onChange={(e) =>
+                          setReviewData({ ...reviewData, name: e.target.value })
+                        }
                         placeholder="Your name"
                         required
                       />
@@ -736,7 +783,12 @@ const ContactPage = () => {
                         type="email"
                         name="reviewerEmail"
                         value={reviewData.email}
-                        onChange={(e) => setReviewData({ ...reviewData, email: e.target.value })}
+                        onChange={(e) =>
+                          setReviewData({
+                            ...reviewData,
+                            email: e.target.value,
+                          })
+                        }
                         placeholder="Your email"
                         required
                       />
@@ -750,23 +802,37 @@ const ContactPage = () => {
                         <select
                           name="serviceUsed"
                           value={reviewData.serviceUsed}
-                          onChange={(e) => setReviewData({ ...reviewData, serviceUsed: e.target.value })}
+                          onChange={(e) =>
+                            setReviewData({
+                              ...reviewData,
+                              serviceUsed: e.target.value,
+                            })
+                          }
                           className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                           required
                         >
                           <option value="">Select a service</option>
-                          <option value="electrical">Electrical Installation</option>
-                          <option value="construction">Building Construction</option>
+                          <option value="electrical">
+                            Electrical Installation
+                          </option>
+                          <option value="construction">
+                            Building Construction
+                          </option>
                           <option value="genparts">GenParts Service</option>
                           <option value="other">Other Services</option>
                         </select>
                       </div>
-                      
+
                       <ModernInput
                         label="Project Location"
                         name="location"
                         value={reviewData.location}
-                        onChange={(e) => setReviewData({ ...reviewData, location: e.target.value })}
+                        onChange={(e) =>
+                          setReviewData({
+                            ...reviewData,
+                            location: e.target.value,
+                          })
+                        }
                         placeholder="e.g., Mombasa, Nairobi"
                         required
                       />
@@ -780,15 +846,24 @@ const ContactPage = () => {
                         <select
                           name="projectCompleted"
                           value={reviewData.projectCompleted}
-                          onChange={(e) => setReviewData({ ...reviewData, projectCompleted: e.target.value })}
+                          onChange={(e) =>
+                            setReviewData({
+                              ...reviewData,
+                              projectCompleted: e.target.value,
+                            })
+                          }
                           className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                           required
                         >
                           <option value="">When was it completed?</option>
                           <option value="last-week">Within last week</option>
                           <option value="last-month">Within last month</option>
-                          <option value="last-3-months">Within last 3 months</option>
-                          <option value="last-6-months">Within last 6 months</option>
+                          <option value="last-3-months">
+                            Within last 3 months
+                          </option>
+                          <option value="last-6-months">
+                            Within last 6 months
+                          </option>
                           <option value="last-year">Within last year</option>
                           <option value="over-year">Over a year ago</option>
                         </select>
@@ -804,20 +879,34 @@ const ContactPage = () => {
                               type="radio"
                               name="wouldRecommend"
                               checked={reviewData.wouldRecommend}
-                              onChange={() => setReviewData({ ...reviewData, wouldRecommend: true })}
+                              onChange={() =>
+                                setReviewData({
+                                  ...reviewData,
+                                  wouldRecommend: true,
+                                })
+                              }
                               className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
                             />
-                            <span className="ml-2 text-sm text-slate-900">Yes</span>
+                            <span className="ml-2 text-sm text-slate-900">
+                              Yes
+                            </span>
                           </label>
                           <label className="flex items-center">
                             <input
                               type="radio"
                               name="wouldRecommend"
                               checked={!reviewData.wouldRecommend}
-                              onChange={() => setReviewData({ ...reviewData, wouldRecommend: false })}
+                              onChange={() =>
+                                setReviewData({
+                                  ...reviewData,
+                                  wouldRecommend: false,
+                                })
+                              }
                               className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
                             />
-                            <span className="ml-2 text-sm text-slate-900">No</span>
+                            <span className="ml-2 text-sm text-slate-900">
+                              No
+                            </span>
                           </label>
                         </div>
                       </div>
@@ -830,7 +919,12 @@ const ContactPage = () => {
                       <textarea
                         name="reviewContent"
                         value={reviewData.content}
-                        onChange={(e) => setReviewData({ ...reviewData, content: e.target.value })}
+                        onChange={(e) =>
+                          setReviewData({
+                            ...reviewData,
+                            content: e.target.value,
+                          })
+                        }
                         placeholder="Share your experience with our service. What went well? What could we improve?"
                         className="w-full h-32 px-4 py-3 rounded-lg border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                         required
@@ -851,15 +945,15 @@ const ContactPage = () => {
                           serviceUsed: "",
                           location: "",
                           wouldRecommend: true,
-                          projectCompleted: ""
+                          projectCompleted: "",
                         });
                         setRating(0);
                       }}
                     >
                       Cancel
                     </ModernButton>
-                    <ModernButton 
-                      type="submit" 
+                    <ModernButton
+                      type="submit"
                       variant="primary"
                       disabled={!rating || !reviewData.content.trim()}
                     >
@@ -910,7 +1004,7 @@ const ContactPage = () => {
       </section>
 
       {/* Quote Request Modal */}
-            <QuoteRequestModal
+      <QuoteRequestModal
         isOpen={isQuoteModalOpen}
         onClose={() => setIsQuoteModalOpen(false)}
         items={[]} // Empty since this is a general quote request
@@ -923,12 +1017,18 @@ const ContactPage = () => {
               requirements: data.requirements,
               budget_range: data.budget_range,
               timeline: data.timeline,
-              status: 'pending',
-              notes: data.notes
+              status: "pending",
+              notes: data.notes,
             });
-            notify.success('Quote Request Sent', 'We will get back to you shortly with a detailed quote.');
+            notify.success(
+              "Quote Request Sent",
+              "We will get back to you shortly with a detailed quote.",
+            );
           } catch (error) {
-            notify.error('Error', 'Failed to submit quote request. Please try again.');
+            notify.error(
+              "Error",
+              "Failed to submit quote request. Please try again.",
+            );
             throw error;
           }
         }}
@@ -967,7 +1067,9 @@ const ContactPage = () => {
               <ul className="space-y-3">
                 <li className="flex items-center gap-3">
                   <Phone className="w-4 h-4 text-slate-400" />
-                  <span className="text-slate-300">{companyInfo.offices[0].phone.join(' / ')}</span>
+                  <span className="text-slate-300">
+                    {companyInfo.offices[0].phone.join(" / ")}
+                  </span>
                 </li>
                 <li className="flex items-center gap-3">
                   <Mail className="w-4 h-4 text-slate-400" />

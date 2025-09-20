@@ -74,6 +74,11 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
+  // Bypass API requests entirely (no SW caching/interception)
+  if (url.pathname.startsWith("/api")) {
+    return;
+  }
+
   // Handle different types of requests
   if (url.pathname === "/") {
     // Homepage - cache first, then network

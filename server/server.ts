@@ -1,7 +1,11 @@
-import express from 'express';
-import cors from 'cors';
-import type { Request, Response, NextFunction } from 'express';
-import contactRoutes from './routes/contact';
+import "dotenv/config";
+import "dotenv/config";
+import express from "express";
+import cors from "cors";
+import type { Request, Response, NextFunction } from "express";
+import contactRoutes from "./routes/contact";
+import quotesEmailRoutes from "./routes/quotes-email";
+import analyticsRoutes from "./routes/analyticsRoutes";
 
 const app = express();
 const PORT = process.env.PORT || 8000;
@@ -17,22 +21,26 @@ app.use((req, res, next) => {
 });
 
 // API Routes
-app.use('/api/contact', contactRoutes);
+app.use("/api/contact", contactRoutes);
+app.use("/api/quotes", quotesEmailRoutes);
+app.use("/api", analyticsRoutes);
 
 // Health check route
-app.get('/health', (req, res) => {
-  res.json({ status: 'ok' });
+app.get("/health", (req, res) => {
+  res.json({ status: "ok" });
 });
 
 // 404 handler
 app.use((req, res) => {
-  res.status(404).json({ success: false, error: 'Not Found' });
+  res.status(404).json({ success: false, error: "Not Found" });
 });
 
 // Error handler
 app.use((err, req, res, next) => {
-  console.error('Server error:', err);
-  res.status(500).json({ success: false, error: 'Server error', details: err.message });
+  console.error("Server error:", err);
+  res
+    .status(500)
+    .json({ success: false, error: "Server error", details: err.message });
 });
 
 app.listen(PORT, () => {

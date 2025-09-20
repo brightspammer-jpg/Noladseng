@@ -842,30 +842,35 @@ export const api: SupabaseApiClient = {
   contact: {
     create: async (data: Partial<ContactMessage>) => {
       try {
-        const { data: message, error } = await supabase
-          .from('contact_messages')
-          .insert([data])
-          .select()
-          .maybeSingle();
-        // Send email notification
-        const emailRes = await fetch('/api/contact/send', {
+        console.log('[contact.create] submitting:', data);
+        // Use server route (service role) to avoid RLS and also send email
+        const res = await fetch('/api/contact/create', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            name: data.name,
-            email: data.email,
-            phone: (data as any).phone,
-            subject: (data as any).subject,
-            message: (data as any).message,
-          })
+          body: JSON.stringify(data)
         });
-        
-        if (!emailRes.ok) {
-          const errorData = await emailRes.json();
-          console.error('Failed to send email notification:', errorData);
-          throw new Error('Failed to send email notification');
+        const text = await res.text();
+        let json: any = null;
+        try { json = text ? JSON.parse(text) : null; } catch {}
+        console.log('[contact.create] response:', { status: res.status, ok: res.ok, body: text });
+        if (!res.ok || !json?.success) {
+          // Fallback: try email-only route so user still gets confirmation
+          try {
+            await fetch('/api/contact/send', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                name: data.name,
+                email: data.email,
+                phone: (data as any)?.phone,
+                subject: (data as any)?.subject,
+                message: (data as any)?.message,
+              })
+            });
+          } catch {}
+          throw new Error((json && (json.error || json.message)) || `HTTP ${res.status}`);
         }
-        return formatResponse(message, error, 'contact.create');
+        return formatResponse(json.data || null, null, 'contact.create');
       } catch (error) {
         return formatResponse(null, error, 'contact.create');
       }
