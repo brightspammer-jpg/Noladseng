@@ -485,6 +485,17 @@ const ContactPage = () => {
                       </div>
                     </div>
 
+                    {/* Message */}
+                    <ModernTextarea
+                      label="Message *"
+                      name="message"
+                      value={formData.message}
+                      onChange={handleInputChange}
+                      placeholder="Tell us about your project requirements"
+                      errorMessage={errors.message}
+                      required
+                    />
+
                     {/* Project Details */}
                     <div className="grid grid-cols-2 gap-4">
                       <div>
