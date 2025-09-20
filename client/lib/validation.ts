@@ -2,7 +2,9 @@ import { z } from 'zod';
 
 // Common validation schemas
 export const emailSchema = z.string().email('Please enter a valid email address');
-export const phoneSchema = z.string().regex(/^[\+]?[1-9][\d]{0,15}$/, 'Please enter a valid phone number');
+export const phoneSchema = z
+  .string()
+  .regex(/^(?:\+?[1-9]\d{6,14}|0\d{9,14})$/, 'Please enter a valid phone number');
 export const requiredStringSchema = z.string().min(1, 'This field is required');
 
 // Contact form validation
