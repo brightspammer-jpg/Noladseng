@@ -70,7 +70,7 @@ const ContactPage = () => {
     phone: "",
     company: "",
     position: "",
-    inquiryType: "",
+    inquiryType: "general",
     project: "",
     timeline: "",
     budget: "",
@@ -188,7 +188,7 @@ const ContactPage = () => {
         phone: "",
         company: "",
         position: "",
-        inquiryType: "",
+        inquiryType: "general",
         project: "",
         timeline: "",
         budget: "",
@@ -881,7 +881,7 @@ const ContactPage = () => {
               Ready to Get Started?
             </h2>
             <p className="text-xl text-blue-100 mb-8">
-              Don't wait – reach out today and let's discuss how we can help you
+              Don't wait ��� reach out today and let's discuss how we can help you
               achieve your electrical engineering goals.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
