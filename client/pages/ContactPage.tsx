@@ -413,6 +413,7 @@ const ContactPage = () => {
                         value={formData.email}
                         onChange={handleInputChange}
                         placeholder="Enter your email"
+                        errorMessage={errors.email}
                         required
                       />
                       <ModernInput
