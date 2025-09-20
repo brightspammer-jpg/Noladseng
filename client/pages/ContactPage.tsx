@@ -423,6 +423,7 @@ const ContactPage = () => {
                         value={formData.phone}
                         onChange={handleInputChange}
                         placeholder="Enter your phone number"
+                        errorMessage={errors.phone}
                       />
                     </div>
 
