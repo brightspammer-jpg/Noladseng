@@ -4,6 +4,7 @@ import cors from 'cors';
 import type { Request, Response, NextFunction } from 'express';
 import contactRoutes from './routes/contact';
 import quotesEmailRoutes from './routes/quotes-email';
+import analyticsRoutes from './routes/analyticsRoutes';
 
 const app = express();
 const PORT = process.env.PORT || 8000;
@@ -21,6 +22,7 @@ app.use((req, res, next) => {
 // API Routes
 app.use('/api/contact', contactRoutes);
 app.use('/api/quotes', quotesEmailRoutes);
+app.use('/api', analyticsRoutes);
 
 // Health check route
 app.get('/health', (req, res) => {
