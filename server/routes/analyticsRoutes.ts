@@ -3,6 +3,15 @@ import { ga4Analytics } from '../services/ga4Analytics';
 
 const router = Router();
 
+// Prevent any caching on analytics endpoints
+router.use('/analytics', (req, res, next) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+  res.setHeader('Surrogate-Control', 'no-store');
+  next();
+});
+
 interface AnalyticsFallbackData {
   pageViews: number;
   sessions: number;
