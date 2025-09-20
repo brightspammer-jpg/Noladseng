@@ -606,7 +606,7 @@ import { ApiResponse } from '@shared/api';
 class GoogleAnalyticsClient {
   async getGoogleAnalytics(): Promise<ApiResponse<AnalyticsOverview>> {
     try {
-      const response = await fetch('/api/analytics/overview');
+      const response = await fetch('/api/analytics/overview', { cache: 'no-store' });
       return await response.json();
     } catch (error) {
       console.error('Error fetching Google Analytics data:', error);
@@ -616,7 +616,7 @@ class GoogleAnalyticsClient {
 
   async getRealTimeData(): Promise<ApiResponse<RealTimeData>> {
     try {
-      const response = await fetch('/api/analytics/realtime');
+      const response = await fetch('/api/analytics/realtime', { cache: 'no-store' });
       return await response.json();
     } catch (error) {
       console.error('Error fetching real-time data:', error);
@@ -626,7 +626,7 @@ class GoogleAnalyticsClient {
 
   async getConversionData(): Promise<ApiResponse<ConversionData>> {
     try {
-      const response = await fetch('/api/analytics/conversions');
+      const response = await fetch('/api/analytics/conversions', { cache: 'no-store' });
       return await response.json();
     } catch (error) {
       console.error('Error fetching conversion data:', error);
