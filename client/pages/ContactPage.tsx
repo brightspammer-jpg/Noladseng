@@ -539,14 +539,19 @@ const ContactPage = () => {
                       </div>
                     </div>
 
+                    {errors.inquiryType && (
+                      <p className="text-red-500 text-sm">{errors.inquiryType}</p>
+                    )}
+
                     <ModernButton
                       type="submit"
                       variant="primary"
                       size="lg"
-                      className="w-full"
+                      disabled={isSubmitting}
+                      className="w-full disabled:opacity-60"
                     >
                       <Send className="w-5 h-5" />
-                      Send Message
+                      {isSubmitting ? 'Sending…' : 'Send Message'}
                     </ModernButton>
                   </form>
                 </CardContent>
