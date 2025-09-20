@@ -444,6 +444,7 @@ const ContactPage = () => {
                         value={formData.position}
                         onChange={handleInputChange}
                         placeholder="Your job title"
+                        errorMessage={errors.position}
                       />
                     </div>
 
