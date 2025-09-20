@@ -603,34 +603,45 @@ export class ABTesting {
 import { AnalyticsOverview, RealTimeData, ConversionData } from '@shared/analytics';
 import { ApiResponse } from '@shared/api';
 
+async function fetchJSON<T = any>(url: string): Promise<T> {
+  const sep = url.includes('?') ? '&' : '?';
+  const tsUrl = `${url}${sep}ts=${Date.now()}`;
+  const opts: RequestInit = { cache: 'no-store', headers: { 'cache-control': 'no-store' } };
+  try {
+    const res = await fetch(tsUrl, opts);
+    return await res.json();
+  } catch (e) {
+    // Retry once with a fresh request if the body was already consumed
+    const res2 = await fetch(`${tsUrl}&retry=1`, opts);
+    return await res2.json();
+  }
+}
+
 class GoogleAnalyticsClient {
   async getGoogleAnalytics(): Promise<ApiResponse<AnalyticsOverview>> {
     try {
-      const response = await fetch('/api/analytics/overview', { cache: 'no-store' });
-      return await response.json();
+      return await fetchJSON('/api/analytics/overview');
     } catch (error) {
       console.error('Error fetching Google Analytics data:', error);
-      return { success: false, error: 'Failed to fetch analytics data' };
+      return { success: false, error: 'Failed to fetch analytics data' } as any;
     }
   }
 
   async getRealTimeData(): Promise<ApiResponse<RealTimeData>> {
     try {
-      const response = await fetch('/api/analytics/realtime', { cache: 'no-store' });
-      return await response.json();
+      return await fetchJSON('/api/analytics/realtime');
     } catch (error) {
       console.error('Error fetching real-time data:', error);
-      return { success: false, error: 'Failed to fetch real-time data' };
+      return { success: false, error: 'Failed to fetch real-time data' } as any;
     }
   }
 
   async getConversionData(): Promise<ApiResponse<ConversionData>> {
     try {
-      const response = await fetch('/api/analytics/conversions', { cache: 'no-store' });
-      return await response.json();
+      return await fetchJSON('/api/analytics/conversions');
     } catch (error) {
       console.error('Error fetching conversion data:', error);
-      return { success: false, error: 'Failed to fetch conversion data' };
+      return { success: false, error: 'Failed to fetch conversion data' } as any;
     }
   }
 }
