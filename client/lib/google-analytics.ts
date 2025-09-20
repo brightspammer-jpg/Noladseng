@@ -47,9 +47,9 @@ class GoogleAnalytics {
 
   constructor(config: Partial<GAConfig> = {}) {
     this.config = {
-      measurementId: process.env.VITE_GA_MEASUREMENT_ID || '',
-      enabled: process.env.NODE_ENV === 'production',
-      debug: process.env.NODE_ENV === 'development',
+      measurementId: import.meta.env.VITE_GA4_MEASUREMENT_ID || '',
+      enabled: import.meta.env.MODE === 'production',
+      debug: import.meta.env.MODE !== 'production',
       anonymizeIp: true,
       cookieExpires: 63072000, // 2 years
       ...config
